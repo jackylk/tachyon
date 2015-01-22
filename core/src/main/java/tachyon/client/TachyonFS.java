@@ -32,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
 import com.google.common.io.Closer;
 
 import tachyon.Constants;
@@ -961,10 +962,20 @@ public class TachyonFS extends AbstractTachyonFS {
    */
   private void validateUri(TachyonURI uri) throws IOException {
     TachyonURI thisFs = getUri();
+    /*
     if (uri == null || (!uri.isPathAbsolute() && !TachyonURI.EMPTY_URI.equals(uri))
         || (uri.hasScheme() && !thisFs.getScheme().equals(uri.getScheme()))
         || (uri.hasAuthority() && !thisFs.getAuthority().equals(uri.getAuthority()))) {
       throw new IOException("Uri " + uri + " is invalid.");
     }
+    */
+    Preconditions.checkArgument(uri != null, "Uri is null");
+    Preconditions.checkArgument(!(!uri.isPathAbsolute() && !TachyonURI.EMPTY_URI.equals(uri)),
+            "Uri is relative");
+    Preconditions.checkArgument(!(uri.hasScheme() && !thisFs.getScheme().equals(uri.getScheme())),
+            "Uri scheme is invalid");
+    Preconditions.checkArgument(
+            !(uri.hasAuthority() && !thisFs.getAuthority().equals(uri.getAuthority())),
+            "Uri authority is invalid");
   }
 }
